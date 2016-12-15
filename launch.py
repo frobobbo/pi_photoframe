@@ -191,18 +191,6 @@ def DownloadPhotosfromGoogle():
 			#Download the photo
 			urllib.urlretrieve(googlePhotoList.get(pic), os.path.join(configdir,"photos",pic))
 			
-def DownloadPhotosfromInstagram():
-	#Download photos from Google Album
-	#But only if they are not already downloaded
-	
-	instagramID = "0a5ccc6eda514123899caab2a40c6430"
-	instagramSecret = "11fbaa68c32245eeac7c6102c7e7e469"
-	accessToken = "3281488305.0a5ccc6.c3d4ddfec59f4336a94cf085636d969c"
-	
-	instagramURL = "https://api.instagram.com/v1/users/jeffmichael1983/media/recent/?access_token=3281488305.0a5ccc6.c3d4ddfec59f4336a94cf085636d969c"
-
-	global currPhotoList
-
 def addTextToPhoto(photo,txt,prof,title):
 	img = Image.open(photo)
 	#font = ImageFont.truetype(<font-file>, <font-size>)
@@ -211,9 +199,7 @@ def addTextToPhoto(photo,txt,prof,title):
 	#draw.text((x, y),"Sample Text",(r,g,b))
 
 	foreground = Image.open(prof)
-#	img.paste(foreground, (0, 0))
 	finalImg = Image.new(mode='RGB',size=(1138,640),color=(0,0,0))
-#	finalImg.paste(img, (249,0))
 	finalImg.paste(img, (480,0))
 	finalImg.paste(foreground, (20,0))
 	
@@ -226,17 +212,9 @@ def addTextToPhoto(photo,txt,prof,title):
 	draw = ImageDraw.Draw(finalImg)
 	print photo
 	
-#	pixColor = pix[180,20]
-#	if pixColor == (255, 255, 255):
-#		draw.text((180, 10),title,(64,64,64),font=titleFont)
-#	else:
 	draw.text((20, 180),title,(255,255,255),font=titleFont)
 
 	for line in lines:
-#		pixColor = pix[300,560+n]
-#		if pixColor == (255, 255, 255):
-#			draw.text((10, 560+n),line,(64,64,64),font=font)
-#		else:
 		draw.text((20, 360+n),line,(255,255,255),font=font)
 		n += 22
 			
