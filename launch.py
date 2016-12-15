@@ -1,6 +1,4 @@
 import argparse
-#import atom
-#import atom.service
 import filecmp
 import gdata
 import gdata.photos.service
@@ -83,7 +81,6 @@ def getCurrentPhotoList():
 def getGooglePhotoList():
 	#Connect to Google Photos and get a list of photos in selected Album
 	global googlePhotoList
-#	email = "johnsobd@gmail.com"
 	email = "113717082999080137494"
 	albumId = "6304648414543671073"
 	client_secrets = os.path.join(configdir, 'client_secrets.json')
@@ -101,7 +98,6 @@ def getGooglePhotoList():
 def getLyndsaysGooglePhotoList():
 	#Connect to Google Photos and get a list of photos in selected Album
 	global googlePhotoList
-	email = "lyndsaymk@gmail.com"
 	userid = "118025501276712540531"
 	albumId = "6358469304898972289"
 	client_secrets = os.path.join(configdir, 'client_secrets.json')
@@ -137,20 +133,14 @@ def getIgPhotoList():
 	igToken = "3281488305.0a5ccc6.c3d4ddfec59f4336a94cf085636d969c"
 	
 	instagramURL = "https://api.instagram.com/v1/users/" + userid + "/media/recent/?access_token=" + igToken
-	#nextUrl = "https://api.instagram.com/v1/tags/"+hashtag+"/media/recent?access_token="+access_token
-	# while there is a next url to go to
-#	while instagramURL:
-	# request the data at that endpoint 
 	instagramJSON = ajaxRequest(instagramURL)
 	instagramDict = json.loads(instagramJSON)
-#	print instagramJSON
-	# get new  nextUrl
 #	instagramURL = instagramDict["pagination"]["next_url"]
 	instagramData = instagramDict["data"]
 	# for every picture
 	profilePic = ""
 	filesDownloaded = 0
-	yesterday = datetime.now() - timedelta(days = 100)
+	yesterday = datetime.now() - timedelta(days = 365)
 	yesterday_beginning = datetime(yesterday.year, yesterday.month, yesterday.day,0,0,0,0)
 	yesterday_beginning_time = int(time.mktime(yesterday_beginning.timetuple()))
 	global svPhotoPath
@@ -254,7 +244,7 @@ def addTextToPhoto(photo,txt,prof,title):
 	
 
 #Download photos from Google Photos Album
-#getIgPhotoList()
+getIgPhotoList()
 getCurrentPhotoList()
 getGooglePhotoList()
 #getLyndsaysGooglePhotoList()
