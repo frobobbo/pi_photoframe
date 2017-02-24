@@ -83,13 +83,13 @@ def getCurrentPhotoList():
 	global currPhotoList
 	currPhotoList = next(os.walk(photoPath))[2]
 
-def getGooglePhotoList():
+def getUser1GooglePhotoList():
 	#Connect to Google Photos and get a list of photos in selected Album
 	global googlePhotoList
 	email = Config.get('GoogleUser1','userid')
 	albumId = Config.get('GoogleUser1','albumId')
 	client_secrets = os.path.join(configdir, 'client_secrets.json')
-	credential_store = os.path.join(configdir, 'BrettCredentials.dat')
+	credential_store = os.path.join(configdir, 'User1Credentials.dat')
 	
 	gd_client = OAuth2Login(client_secrets, credential_store, email)
 
@@ -100,13 +100,13 @@ def getGooglePhotoList():
 	for photo in photos.entry:
 		googlePhotoList[photo.title.text] = photo.content.src
 
-def getLyndsaysGooglePhotoList():
+def getUser2GooglePhotoList():
 	#Connect to Google Photos and get a list of photos in selected Album
 	global googlePhotoList
 	userid = Config.get('GoogleUser2','userid')
 	albumId = Config.get('GoogleUser2','albumId')
 	client_secrets = os.path.join(configdir, 'client_secrets.json')
-	credential_store = os.path.join(configdir, 'LyndsayCredentials.dat')
+	credential_store = os.path.join(configdir, 'User2Credentials.dat')
 
 	gd_client2 = OAuth2Login(client_secrets, credential_store, userid)
 
@@ -229,8 +229,8 @@ def addTextToPhoto(photo,txt,prof,title):
 #Download photos from Google Photos Album
 getIgPhotoList()
 getCurrentPhotoList()
-getGooglePhotoList()
-#getLyndsaysGooglePhotoList()
+getUser1GooglePhotoList()
+getUser2GooglePhotoList()
 RemovePhotosfromAlbum()
 DownloadPhotosfromGoogle()
 
