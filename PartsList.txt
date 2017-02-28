@@ -1,0 +1,11 @@
+1. Raspberry Pi Zero
+2. LCD Display
+3. LCD Display Driver
+4. MicroSD Card
+5. Power Supply for LCD Driver
+6. Display Adapter - VGA or HDMI (VGA seems to work best)
+7. Shadowbox frame - size depends on LCD
+
+
+References:
+https://www.raspberrypi.org/forums/viewtopic.php?f=40&t=67312
