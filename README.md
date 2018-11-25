@@ -2,7 +2,7 @@
 Python Script to download photos from Instagram/Google Photos and display
 
 # Setup
-Follow the follwing instructions for headleas wifi config:
+Follow the follwing instructions for headless wifi config:
 1) Create an empty file in the Boot directory called ssh
 2) Create a new file called wpa_supplicant.conf with the following code:
 ```
@@ -16,4 +16,8 @@ network={
     psk="your_real_password"
     key_mgmt=WPA-PSK
 }
+```
+3) Add the following to the end of cmdline.txt:
+```
+quiet splash plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_default=0
 ```
