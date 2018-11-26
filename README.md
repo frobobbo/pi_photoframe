@@ -25,9 +25,7 @@ quiet splash plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_defaul
 ```
 #Ensure Plymouth is installed and up to date
 #Install Plymouth Themes and Pix Theme
-sudo apt-get install plymouth
-sudo apt-get install plymouth-theme
-sudo apt-get install pix-plym-splash
+sudo apt-get install plymouth plymouth-themes pix-plym-splash
 
 #Set the Default Theme
 sudo plymouth-set-default-theme pix --rebuild-initrd
