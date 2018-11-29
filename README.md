@@ -19,7 +19,7 @@ network={
 ```
 3) Add the following to the end of cmdline.txt:
 ```
-quiet splash ~~plymouth.ignore-serial-consoles~~ logo.nologo vt.global_cursor_default=0
+quiet logo.nologo vt.global_cursor_default=0
 ```
 ~~4) Configure Plymouth Boot Screen~~
 Plymouth does not work well with rPI0
