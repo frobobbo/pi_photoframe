@@ -19,9 +19,10 @@ network={
 ```
 3) Add the following to the end of cmdline.txt:
 ```
-quiet splash plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_default=0
+quiet splash ~~plymouth.ignore-serial-consoles~~ logo.nologo vt.global_cursor_default=0
 ```
-4) Configure Plymouth Boot Screen
+~~4) Configure Plymouth Boot Screen~~
+Plymouth does not work well with rPI0
 ```
 #Ensure Plymouth is installed and up to date
 #Install Plymouth Themes and Pix Theme
@@ -30,3 +31,5 @@ sudo apt-get install plymouth plymouth-themes pix-plym-splash
 #Set the Default Theme
 sudo plymouth-set-default-theme pix --rebuild-initrd
 ```
+4) Configure Boot Screen:
+https://yingtongli.me/blog/2016/12/21/splash.html
