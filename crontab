@@ -1,0 +1,2 @@
+00 21 * * * sh /home/pi/cronjobs/sleep.sh
+00 09 * * * sh /home/pi/cronjobs/wake.sh
