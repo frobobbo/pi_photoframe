@@ -19,7 +19,7 @@ network={
 ```
 3) Add the following to the end of cmdline.txt:
 ```
-quiet logo.nologo vt.global_cursor_default=0
+quiet logo.nologo vt.global_cursor_default=0 consoleblank=0 loglevel=1 disable_splash=1 console=tty3
 ```
 ~~4) Configure Plymouth Boot Screen~~
 Plymouth does not work well with rPI0
@@ -31,5 +31,10 @@ sudo apt-get install plymouth plymouth-themes pix-plym-splash
 #Set the Default Theme
 sudo plymouth-set-default-theme pix --rebuild-initrd
 ```
+4) Disable the Login Prompt:
+```
+systemctl disable getty@tty1
+```
+
 4) Configure Boot Screen:
 https://yingtongli.me/blog/2016/12/21/splash.html
