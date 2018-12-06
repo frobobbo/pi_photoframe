@@ -38,3 +38,4 @@ systemctl disable getty@tty1
 
 4) Configure Boot Screen:
 https://yingtongli.me/blog/2016/12/21/splash.html
+ffmpeg -i animated.gif folder\%04d.bmp
