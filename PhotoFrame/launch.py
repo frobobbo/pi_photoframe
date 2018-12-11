@@ -54,7 +54,7 @@ googleCaptionList = {}
 igPhotoList = {}
 
 Config = configparser.ConfigParser()
-Config.read("config.Captions.ini")
+Config.read("config.ini")
 
 
 ########################################################################
