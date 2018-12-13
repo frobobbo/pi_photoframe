@@ -1,12 +1,6 @@
 import argparse
 import configparser
 import filecmp
-import gdata
-import gdata.photos.service
-import gdata.media
-import gdata.geo
-import gdata.gauth
-import getpass
 import glob
 import httplib2
 import io
@@ -18,18 +12,18 @@ import subprocess
 import tempfile
 import textwrap
 import time
-import urllib		
-import urllib2		
+import urllib
+import urllib2
 import webbrowser
 
+from apiclient.discovery import build
 from datetime import datetime, timedelta
 from oauth2client.client import flow_from_clientsecrets
-from oauth2client.file import Storage
-from gdata.photos.service import GPHOTOS_INVALID_ARGUMENT, GPHOTOS_INVALID_CONTENT_TYPE, GooglePhotosException
+from oauth2client import file, client, tools
 
 from PIL import Image
 from PIL import ImageFont
-from PIL import ImageDraw 
+from PIL import ImageDraw
 
 ########################################################################
 #                                                                      #
@@ -38,16 +32,21 @@ from PIL import ImageDraw
 ########################################################################
 
 osType = platform.system()
+print osType
 
 if osType == "Windows":
 	#Windows
 	configdir = os.path.expanduser("~\Documents\PhotoFrame")
 	fontName = "calibrib.ttf"
+elif osType == "Darwin":
+	#MacOS
+	fontName = "/Library/Fonts/DejaVuSerif.ttf"
+	configdir = os.path.expanduser("~/Documents/PhotoFrame")
 else:
 	#linux
 	fontName = "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
 	configdir = os.path.expanduser("~/PhotoFrame")
-
+    
 currPhotoList = []
 googlePhotoList = {}
 googleCaptionList = {}
@@ -56,38 +55,30 @@ igPhotoList = {}
 Config = configparser.ConfigParser()
 Config.read("config.ini")
 
-
 ########################################################################
 #                                                                      #
-#  Oauth routine to login to Google Photos/Picasa Web API              #
+#  Oauth routine to login to Google Photos API                         #
 #                                                                      #
 ########################################################################
 
 def OAuth2Login(client_secrets, credential_store, email):
-    scope='https://picasaweb.google.com/data/'
-    user_agent='picasawebuploader'
+# Setup the Photo v1 API
+	SCOPES = 'https://www.googleapis.com/auth/photoslibrary.readonly'
+	store = file.Storage(credential_store)
+	creds = store.get()
+	if not creds or creds.invalid:
+		flow = client.flow_from_clientsecrets(client_secrets, SCOPES)
+		creds = tools.run_flow(flow, store)
 
-    storage = Storage(credential_store)
-    credentials = storage.get()
-    if credentials is None or credentials.invalid:
-        flow = flow_from_clientsecrets(client_secrets, scope=scope, redirect_uri='urn:ietf:wg:oauth:2.0:oob')
-        uri = flow.step1_get_authorize_url()
-        webbrowser.open(uri)
-        code = raw_input('Enter the authentication code: ').strip()
-        credentials = flow.step2_exchange(code)
+	if (creds.token_expiry - datetime.utcnow()) < timedelta(minutes=5):
+		http = httplib2.Http()
+		http = creds.authorize(http)
+		creds.refresh(http)
 
-    if (credentials.token_expiry - datetime.utcnow()) < timedelta(minutes=5):
-        http = httplib2.Http()
-        http = credentials.authorize(http)
-        credentials.refresh(http)
+	store.put(creds)
+	service = build('photoslibrary', 'v1', http=creds.authorize(httplib2.Http()))
 
-    storage.put(credentials)
-
-    gd_client = gdata.photos.service.PhotosService(source=user_agent,
-                                                   email=email,
-                                                   additional_headers={'Authorization' : 'Bearer %s' % credentials.access_token})
-
-    return gd_client
+	return service
 
 ########################################################################
 #                                                                      #
@@ -98,6 +89,7 @@ def OAuth2Login(client_secrets, credential_store, email):
 
 def getCurrentPhotoList():
 	photoPath = os.path.join(configdir,"photos")
+	print photoPath
 	global currPhotoList
 	currPhotoList = next(os.walk(photoPath))[2]
 
@@ -109,27 +101,33 @@ def getCurrentPhotoList():
 ########################################################################
 
 def getGooglePhotoList():
-	#Connect to Google Photos and get a list of photos in selected Album
+#Connect to Google Photos and get a list of photos in selected Album
 
-        gUserCount = int(Config.get('GoogleUsers','Count'))
+	gUserCount = int(Config.get('GoogleUsers','Count'))
 	for x in range(gUserCount):
-        	global googlePhotoList
-                email = Config.get('GoogleUser' + str(x+1),'userid')
-                albumId = Config.get('GoogleUser' + str(x+1),'albumId')
-                client_secrets = os.path.join(configdir, 'client_secrets.json')
-                credential_store = os.path.join(configdir, 'GoogleUser' + str(x+1) + 'Credentials.dat')
+		global googlePhotoList
+		email = Config.get('GoogleUser' + str(x+1),'userid')
+		albumId = Config.get('GoogleUser' + str(x+1),'albumId')
+		client_secrets = os.path.join(configdir, 'client_secrets.json')
+		credential_store = os.path.join(configdir, 'GoogleUser' + str(x+1) + 'Credentials.dat')
 	
-                gd_client = OAuth2Login(client_secrets, credential_store, email)
+		gd_client = OAuth2Login(client_secrets, credential_store, email)
 
-                photos = gd_client.GetFeed('/data/feed/api/user/%s/albumid/%s?kind=photo&imgmax=1280' % (email, albumId))
+		#Get Photos in Album
+		alID = "AHfpHxQ_HcfkMVuMvqQR_v9gCZA7ZCelYR_RwkP7ODBZzIL9SLz1vQYiPylXgGPzVzLHad3z88Hm"
+		body = {
+			"albumId": albumId,
+			"pageSize": 100
+		}
+		photoList = gd_client.mediaItems().search(body=body).execute()
+		photos = photoList.get('mediaItems',[])
 
-        	for photo in photos.entry:
-                	googlePhotoList[photo.title.text] = photo.content.src
-                	if photo.summary.text:
-                                googleCaptionList[photo.title.text] = photo.summary.text
-                        #else:
-                                #googleCaptionList[photo.title.text] = 'None'
-                #print googlePhotoList
+		for photo in photos:
+			googlePhotoList[photo["filename"]] = photo["baseUrl"]+"=w1024"
+			try:
+				googleCaptionList[photo["filename"]] = photo['description'] #.encode('utf-8').strip()
+			except KeyError:
+				pass
 
 ########################################################################
 #                                                                      #
@@ -163,14 +161,15 @@ def DownloadPhotosfromGoogle():
 	global currPhotoList
 	global googlePhotoList
 
+
 	for pic in googlePhotoList:
 		if pic not in currPhotoList or pic in googleCaptionList:
 			#Download the photo
-                        print "Download: " + str(googlePhotoList.get(pic))
+			print "Download: " + str(googlePhotoList.get(pic))
 			urllib.urlretrieve(googlePhotoList.get(pic), os.path.join(configdir,"photos",pic))
-                        if pic in googleCaptionList:
-                                print "Photo will be captioned with: " + str(googleCaptionList.get(pic))
-                                addRoundedCaption(os.path.join(configdir,"photos",pic),googleCaptionList.get(pic))
+			if pic in googleCaptionList:
+				#print "Photo will be captioned with: " + str(googleCaptionList.get(pic))
+				addRoundedCaption(os.path.join(configdir,"photos",pic),googleCaptionList.get(pic))
 
 ########################################################################
 #                                                                      #
@@ -180,52 +179,52 @@ def DownloadPhotosfromGoogle():
 ########################################################################
 
 def round_corner(radius, cfill):
-        corner = Image.new('RGBA', (radius, radius), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(corner)
-        draw.pieslice((0, 0, radius * 2, radius * 2), 180, 270, fill=cfill)
-        return corner
+	corner = Image.new('RGBA', (radius, radius), (0, 0, 0, 0))
+	draw = ImageDraw.Draw(corner)
+	draw.pieslice((0, 0, radius * 2, radius * 2), 180, 270, fill=cfill)
+	return corner
 
 def addRoundedCaption(photo,txt):
-        img = Image.open(photo)
-        lineSpacing = 27
+	img = Image.open(photo)
+	lineSpacing = 27
 	font = ImageFont.truetype(fontName, 24)
 	lines = textwrap.wrap(txt, 60, break_long_words=False)
 
 	imgCapH = len(lines) * lineSpacing + (2 * lineSpacing)
-        imgCapW = img.width * .7
+	imgCapW = img.width * .7
         
-        imgCap = Image.new("RGBA", (int(imgCapW),int(imgCapH)))
+	imgCap = Image.new("RGBA", (int(imgCapW),int(imgCapH)))
 
-        colorFill = (255,255,255,127)
-        radius = 10
+	colorFill = (255,255,255,127)
+	radius = 10
         
-        pdraw = ImageDraw.Draw(imgCap)
-        pdraw.rectangle(((0,0), (imgCapW,imgCapH)), fill=colorFill, outline=(255,255,255,255))
+	pdraw = ImageDraw.Draw(imgCap)
+	pdraw.rectangle(((0,0), (imgCapW,imgCapH)), fill=colorFill, outline=(255,255,255,255))
         
-        corner = round_corner(radius, colorFill)
-        imgCap.paste(corner, (0, 0))
-        imgCap.paste(corner.rotate(90), (0, imgCapH - radius)) # Rotate the corner and paste it
-        imgCap.paste(corner.rotate(180), (int(imgCapW - radius), imgCapH - radius))
-        imgCap.paste(corner.rotate(270), (int(imgCapW - radius), 0))
+	corner = round_corner(radius, colorFill)
+	imgCap.paste(corner, (0, 0))
+	imgCap.paste(corner.rotate(90), (0, imgCapH - radius)) # Rotate the corner and paste it
+	imgCap.paste(corner.rotate(180), (int(imgCapW - radius), imgCapH - radius))
+	imgCap.paste(corner.rotate(270), (int(imgCapW - radius), 0))
 
-       	n = 0
+	n = 0
 	for line in lines:
-                text_size = pdraw.textsize(line, font)
-                print "text size: " + str(text_size)
-                print "Drawing text: " + line
+		text_size = pdraw.textsize(line, font)
+		print "text size: " + str(text_size)
+		print "Drawing text: " + line
 		pdraw.text((((imgCapW - text_size[0])/2), lineSpacing+n),line,(0,0,0),font=font)
 		n += lineSpacing
 
 
-        img.paste(imgCap, (int((img.width - imgCapW)/2),20), mask=imgCap)
-        img.save(photo)
+	img.paste(imgCap, (int((img.width - imgCapW)/2),20), mask=imgCap)
+	img.save(photo)
 
 
 def ajaxRequest(url=None):
-	"""
-	Makes an ajax get request.
-	url - endpoint(string)
-	"""
+	#"""
+	#Makes an ajax get request.
+	#url - endpoint(string)
+	#"""
 	req = urllib2.Request(url)
 	f = urllib2.urlopen(req)
 	response = f.read()
@@ -258,10 +257,10 @@ def getIgPhotoList():
 		imageUrl = image["url"]
 		profilePic = picDict["user"]["profile_picture"]
 		if not picDict["location"]:
-                        title = ""
-                else:
-                        title = picDict["location"]["name"]
-                picDate = datetime.utcfromtimestamp(int(createTime)).strftime('%m/%d/%Y')
+			title = ""
+		else:
+			title = picDict["location"]["name"]
+			picDate = datetime.utcfromtimestamp(int(createTime)).strftime('%m/%d/%Y')
 		if int(createTime) > int(yesterday_beginning_time):
 			svPhotoName = "jeff-" + createTime + ".jpg"
 			svPhotoPath = os.path.join(configdir,"photos",svPhotoName)
@@ -307,14 +306,14 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 	
 #Download photos from Instagram
 if Config.get('Plugins','Instagram') == 'True':
-        getIgPhotoList()
+	getIgPhotoList()
 
 #Download photos from Google Photos Album
 if Config.get('Plugins','GooglePhotos') == 'True':
-        getCurrentPhotoList()
-        getGooglePhotoList()
-        RemovePhotosfromAlbum()
-        DownloadPhotosfromGoogle()
+	getCurrentPhotoList()
+	getGooglePhotoList()
+	RemovePhotosfromAlbum()
+	DownloadPhotosfromGoogle()
 
 #Start the slideshow		
 #os.system('sudo fbi -T 1 -noverbose -a -t 60 -u ~/PhotoFrame/photos/*')
