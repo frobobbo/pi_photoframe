@@ -114,7 +114,6 @@ def getGooglePhotoList():
 		gd_client = OAuth2Login(client_secrets, credential_store, email)
 
 		#Get Photos in Album
-		alID = "AHfpHxQ_HcfkMVuMvqQR_v9gCZA7ZCelYR_RwkP7ODBZzIL9SLz1vQYiPylXgGPzVzLHad3z88Hm"
 		body = {
 			"albumId": albumId,
 			"pageSize": 100
@@ -143,7 +142,7 @@ def RemovePhotosfromAlbum():
 	global googlePhotoList
 
 	for pic in currPhotoList:
-		if pic not in googlePhotoList and "jeff" not in pic:
+		if pic not in googlePhotoList and "ig-" not in pic:
 			#delete photo from local album
 			filePath = os.path.join(configdir,"photos",pic)
 			os.remove(filePath)
@@ -233,45 +232,46 @@ def ajaxRequest(url=None):
 		
 def getIgPhotoList():
 	global igPhotoList
-	userid = Config.get('Instagram','userid')
-	igToken = Config.get('Instagram','igToken')
+	igUserCount = int(Config.get('InstagramUsers','Count'))
+	for x in range(igUserCount):
+		userid = Config.get('InstagramUser'+ str(x+1),'userid')
+		igToken = Config.get('InstagramUser'+ str(x+1),'igToken')
+		instagramURL = "https://api.instagram.com/v1/self/media/recent/?access_token=" + igToken
+		instagramJSON = ajaxRequest(instagramURL)
+		instagramDict = json.loads(instagramJSON)
+		instagramData = instagramDict["data"]
+		# for every picture
+		profilePic = ""
+		filesDownloaded = 0
+		yesterday = datetime.now() - timedelta(days = 720)
+		yesterday_beginning = datetime(yesterday.year, yesterday.month, yesterday.day,0,0,0,0)
+		yesterday_beginning_time = int(time.mktime(yesterday_beginning.timetuple()))
+		global svPhotoPath
+		svPhotoPath = ""
 	
-	instagramURL = "https://api.instagram.com/v1/users/" + userid + "/media/recent/?access_token=" + igToken
-	instagramJSON = ajaxRequest(instagramURL)
-	instagramDict = json.loads(instagramJSON)
-	instagramData = instagramDict["data"]
-	# for every picture
-	profilePic = ""
-	filesDownloaded = 0
-	yesterday = datetime.now() - timedelta(days = 720)
-	yesterday_beginning = datetime(yesterday.year, yesterday.month, yesterday.day,0,0,0,0)
-	yesterday_beginning_time = int(time.mktime(yesterday_beginning.timetuple()))
-	global svPhotoPath
-	svPhotoPath = ""
+		for picDict in instagramData:
+			# get the image url and current time
+			image = picDict["images"]["standard_resolution"]
+			caption = picDict["caption"]["text"]
+			createTime = picDict["caption"]["created_time"]
+			imageUrl = image["url"]
+			profilePic = picDict["user"]["profile_picture"]
+			if not picDict["location"]:
+				title = ""
+			else:
+				title = picDict["location"]["name"]
+				picDate = datetime.utcfromtimestamp(int(createTime)).strftime('%m/%d/%Y')
+			if int(createTime) > int(yesterday_beginning_time):
+				svPhotoName = "ig-" + createTime + ".jpg"
+				svPhotoPath = os.path.join(configdir,"photos",svPhotoName)
+				svProfilePath = os.path.join(configdir,"photos","ProfPic.jpg")
+				urllib.urlretrieve(imageUrl, svPhotoPath)
+				urllib.urlretrieve(profilePic, svProfilePath)
+				addTextToPhoto(svPhotoPath,caption,svProfilePath,title,picDate)
+				filesDownloaded+=1
 	
-	for picDict in instagramData:
-		# get the image url and current time
-		image = picDict["images"]["standard_resolution"]
-		caption = picDict["caption"]["text"]
-		createTime = picDict["caption"]["created_time"]
-		imageUrl = image["url"]
-		profilePic = picDict["user"]["profile_picture"]
-		if not picDict["location"]:
-			title = ""
-		else:
-			title = picDict["location"]["name"]
-			picDate = datetime.utcfromtimestamp(int(createTime)).strftime('%m/%d/%Y')
-		if int(createTime) > int(yesterday_beginning_time):
-			svPhotoName = "jeff-" + createTime + ".jpg"
-			svPhotoPath = os.path.join(configdir,"photos",svPhotoName)
-			svProfilePath = os.path.join(configdir,"photos","ProfPic.jpg")
-			urllib.urlretrieve(imageUrl, svPhotoPath)
-			urllib.urlretrieve(profilePic, svProfilePath)
-			addTextToPhoto(svPhotoPath,caption,svProfilePath,title,picDate)
-			filesDownloaded+=1
-	
-	if int(filesDownloaded) > 0:
-		os.remove(svProfilePath)
+		if int(filesDownloaded) > 0:
+			os.remove(svProfilePath)
 			
 def addTextToPhoto(photo,txt,prof,title,dt):
 	img = Image.open(photo)
