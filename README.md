@@ -1,6 +1,15 @@
 # pi_photoframe
 Python Script to download photos from Instagram/Google Photos and display
 
+# TODO:
+1) Create Shell script to peform the following:
+    - Download the config file from website
+    - Download the auth dats from website
+    - Execute the python script to get the photos
+    - launch FBI slideshow
+2) Remove FBI launch from python script
+3) Create a setup script to build the PI
+
 # Setup
 Follow the follwing instructions for headless wifi config:
 1) Create an empty file in the Boot directory called ssh
