@@ -29,5 +29,22 @@ quiet logo.nologo vt.global_cursor_default=0 consoleblank=0 loglevel=1 disable_s
 systemctl disable getty@tty1
 ```
 5) Configure Boot Screen:
-https://yingtongli.me/blog/2016/12/21/splash.html
-ffmpeg -i animated.gif folder\%04d.bmp
+    Reference: https://yingtongli.me/blog/2016/12/21/splash.html
+    - Create the file /etc/systemd/system/splashscreen.service with the following content
+    ``` 
+    [Unit]
+    Description=Splash screen
+    DefaultDependencies=no
+    After=local-fs.target
+
+    [Service]
+    ExecStart=/usr/bin/fbi -d /dev/fb0 --noverbose -a /opt/splash.png
+    StandardInput=tty
+    StandardOutput=tty
+
+    [Install]
+    WantedBy=sysinit.target
+    ```
+    
+    
+    :ffmpeg -i animated.gif folder\%04d.bmp
