@@ -7,6 +7,9 @@
 # download the latest config file
 curl -X POST -F "frameID=1" https://auth.cstoneweb.com/getConfig.php -o ./PhotoFrame/config.ini
 
+# download the latest user dats
+sudo -u pi python /home/pi/PhotoFrame/launch.py
+
 #launch the python script to download the files
 sudo -u pi python /home/pi/PhotoFrame/launch.py
 
