@@ -46,7 +46,7 @@ else:
 
 datURL = "https://auth.cstoneweb.com/auths/"
 Config = configparser.ConfigParser()
-Config.read("config.ini")
+Config.read(Config.read(os.path.join(configdir,"config.ini")))
 
 def checkFileDate(url):
 	req = urllib2.Request(url)
