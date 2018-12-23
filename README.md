@@ -2,13 +2,7 @@
 Python Script to download photos from Instagram/Google Photos and display
 
 # TODO:
-1) Create Shell script to peform the following:
-    - Download the config file from website
-    - Download the auth dats from website
-    - Execute the python script to get the photos
-    - launch FBI slideshow
-2) Remove FBI launch from python script
-3) Create a setup script to build the PI
+1) Create Global Config file
 
 # Setup
 Follow the follwing instructions for headless wifi config:
@@ -30,21 +24,10 @@ network={
 ```
 quiet logo.nologo vt.global_cursor_default=0 consoleblank=0 loglevel=1 disable_splash=1 console=tty3
 ```
-~~4) Configure Plymouth Boot Screen~~
-Plymouth does not work well with rPI0
-```
-#Ensure Plymouth is installed and up to date
-#Install Plymouth Themes and Pix Theme
-sudo apt-get install plymouth plymouth-themes pix-plym-splash
-
-#Set the Default Theme
-sudo plymouth-set-default-theme pix --rebuild-initrd
-```
 4) Disable the Login Prompt:
 ```
 systemctl disable getty@tty1
 ```
-
-4) Configure Boot Screen:
+5) Configure Boot Screen:
 https://yingtongli.me/blog/2016/12/21/splash.html
 ffmpeg -i animated.gif folder\%04d.bmp
