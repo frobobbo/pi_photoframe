@@ -4,7 +4,7 @@
 
 # download the latest config file
 # TODO: This URL should and frameID should be pulled from a Global Config file
-curl -X POST -F "frameID=1" https://auth.cstoneweb.com/getConfig.php -o ./PhotoFrame/config.ini
+curl -X POST -F "frameID=1" https://auth.cstoneweb.com/getConfig.php -o /home/pi/PhotoFrame/config.ini
 
 # download the latest user dats
 sudo -u pi python /home/pi/PhotoFrame/getGoogleCreds.py
@@ -16,4 +16,4 @@ sudo -u pi python /home/pi/PhotoFrame/launch.py
 sudo service bootscreen stop
 
 #launch the fbi slideshow
-sudo fbi -T 1 -noverbose -a -t 60 -u ~/PhotoFrame/photos/*
+sudo fbi -T 1 -noverbose -a -t 60 -u /home/pi/PhotoFrame/photos/*
