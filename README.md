@@ -33,18 +33,22 @@ systemctl disable getty@tty1
     - Create the file /etc/systemd/system/splashscreen.service with the following content
     ``` 
     [Unit]
-    Description=Splash screen
+    Description=Boot Splash Screen
     DefaultDependencies=no
     After=local-fs.target
 
     [Service]
-    ExecStart=/usr/bin/fbi -d /dev/fb0 --noverbose -a /opt/splash.png
+    ExecStart=/bin/sh -c '/usr/share/bootscreen/bannerd -vD /usr/share/bootscreen/frames/*.bmp'
     StandardInput=tty
     StandardOutput=tty
 
     [Install]
-    WantedBy=sysinit.target
+    WantedBy=local-fs.target
     ```
+    - Download bannerd to /usr/share/bootscreen
+    - unzip frames.zip to /usr/share/bootscreen/frames
+    - Execute the following to enable the service:
+    ```systemctl enable splashscreen```
     
     
     :ffmpeg -i animated.gif folder\%04d.bmp
