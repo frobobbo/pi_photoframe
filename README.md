@@ -49,6 +49,5 @@ systemctl disable getty@tty1
     - unzip frames.zip to /usr/share/bootscreen/frames
     - Execute the following to enable the service:
     ```systemctl enable splashscreen```
-    
-    
-    :ffmpeg -i animated.gif folder\%04d.bmp
+    - Animated files can be created from an animated gif using ffmpeg:
+    ```ffmpeg -i animated.gif folder\%04d.bmp```
