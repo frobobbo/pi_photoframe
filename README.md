@@ -30,7 +30,7 @@ systemctl disable getty@tty1
 ```
 5) Configure Boot Screen:
     Reference: https://yingtongli.me/blog/2016/12/21/splash.html
-    - Create the file /etc/systemd/system/splashscreen.service with the following content
+    - Create the file /etc/systemd/system/bootscreen.service with the following content
     ``` 
     [Unit]
     Description=Boot Splash Screen
