@@ -2,6 +2,7 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install python-pip
 sudo apt-get install libjpeg-dev
+sudo apt-get install fbi
 pip install --upgrade pip
 pip install httplib2
 pip install oauth2client
