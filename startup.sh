@@ -5,10 +5,11 @@
 # stop the bootscreen service
 
 # download the latest config file
+# TODO: This URL should and frameID should be pulled from a Global Config file
 curl -X POST -F "frameID=1" https://auth.cstoneweb.com/getConfig.php -o ./PhotoFrame/config.ini
 
 # download the latest user dats
-sudo -u pi python /home/pi/PhotoFrame/launch.py
+sudo -u pi python /home/pi/PhotoFrame/getGoogleCreds.py
 
 #launch the python script to download the files
 sudo -u pi python /home/pi/PhotoFrame/launch.py
