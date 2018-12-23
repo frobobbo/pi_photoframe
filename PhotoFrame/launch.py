@@ -109,7 +109,7 @@ def getGooglePhotoList():
 		email = Config.get('GoogleUser' + str(x+1),'userid')
 		albumId = Config.get('GoogleUser' + str(x+1),'albumId')
 		client_secrets = os.path.join(configdir, 'client_secrets.json')
-		credential_store = os.path.join(configdir, 'GoogleUser' + str(x+1) + 'Credentials.dat')
+		credential_store = os.path.join(configdir, email + '.dat')
 	
 		gd_client = OAuth2Login(client_secrets, credential_store, email)
 
@@ -236,7 +236,8 @@ def getIgPhotoList():
 	for x in range(igUserCount):
 		userid = Config.get('InstagramUser'+ str(x+1),'userid')
 		igToken = Config.get('InstagramUser'+ str(x+1),'igToken')
-		instagramURL = "https://api.instagram.com/v1/self/media/recent/?access_token=" + igToken
+		instagramURL = "https://api.instagram.com/v1/users/"+userid+"/media/recent/?access_token=" + igToken
+		print instagramURL
 		instagramJSON = ajaxRequest(instagramURL)
 		instagramDict = json.loads(instagramJSON)
 		instagramData = instagramDict["data"]
@@ -256,8 +257,11 @@ def getIgPhotoList():
 			createTime = picDict["caption"]["created_time"]
 			imageUrl = image["url"]
 			profilePic = picDict["user"]["profile_picture"]
+			print caption
+			print createTime
 			if not picDict["location"]:
 				title = ""
+				picDate = ""
 			else:
 				title = picDict["location"]["name"]
 				picDate = datetime.utcfromtimestamp(int(createTime)).strftime('%m/%d/%Y')
@@ -306,14 +310,30 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 	
 #Download photos from Instagram
 if Config.get('Plugins','Instagram') == 'True':
-	getIgPhotoList()
+        try:
+                getIgPhotoList()
+        except:
+                print "there was a problem with the Instagram Plugin"
 
 #Download photos from Google Photos Album
 if Config.get('Plugins','GooglePhotos') == 'True':
-	getCurrentPhotoList()
-	getGooglePhotoList()
-	RemovePhotosfromAlbum()
-	DownloadPhotosfromGoogle()
+        try:
+        	getCurrentPhotoList()
+        except:
+                print "There was a problem getting the current Photo List"
+        try:
+        	getGooglePhotoList()
+        except:
+                print "There was a problem getting the Photo List from Google"
+
+        try:
+                RemovePhotosfromAlbum()
+        except:
+                print "There was a problem deleting photos."
+        try:
+                DownloadPhotosfromGoogle()
+        except:
+                print "There was a problem Downloading photos from Google"
 
 #Start the slideshow		
 #os.system('sudo fbi -T 1 -noverbose -a -t 60 -u ~/PhotoFrame/photos/*')
