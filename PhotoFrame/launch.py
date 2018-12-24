@@ -41,11 +41,11 @@ if osType == "Windows":
 	fontName = "calibrib.ttf"
 elif osType == "Darwin":
 	#MacOS
-	fontName = "/Library/Fonts/Symbola.ttf"
+	fontName = "/Library/Fonts/DejaVuSans.ttf"
 	configdir = os.path.expanduser("~/Documents/PhotoFrame")
 else:
 	#linux
-	fontName = "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
+	fontName = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 	configdir = os.path.expanduser("~/PhotoFrame")
     
 currPhotoList = []
