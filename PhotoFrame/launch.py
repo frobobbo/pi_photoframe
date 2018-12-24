@@ -15,6 +15,7 @@ import time
 import urllib
 import urllib2
 import webbrowser
+import emoji
 
 from apiclient.discovery import build
 from datetime import datetime, timedelta
@@ -40,7 +41,7 @@ if osType == "Windows":
 	fontName = "calibrib.ttf"
 elif osType == "Darwin":
 	#MacOS
-	fontName = "/Library/Fonts/DejaVuSerif.ttf"
+	fontName = "/Library/Fonts/Symbola.ttf"
 	configdir = os.path.expanduser("~/Documents/PhotoFrame")
 else:
 	#linux
@@ -278,9 +279,10 @@ def getIgPhotoList():
 			os.remove(svProfilePath)
 			
 def addTextToPhoto(photo,txt,prof,title,dt):
+
 	img = Image.open(photo)
 	#font = ImageFont.truetype(<font-file>, <font-size>)
-	font = ImageFont.truetype(fontName, 18)
+	font = ImageFont.truetype(fontName, 24)
 	titleFont = ImageFont.truetype(fontName, 26)
 	dtFont = ImageFont.truetype(fontName, 20)
 	#draw.text((x, y),"Sample Text",(r,g,b))
@@ -290,7 +292,7 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 	finalImg.paste(img, (480,0))
 	finalImg.paste(foreground, (20,0))
 	
-	lines = textwrap.wrap(txt, 50, break_long_words=False)
+	lines = textwrap.wrap(txt, 35, break_long_words=False)
 	n = 0
 
 	finalImg.save(photo)
@@ -299,12 +301,13 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 	draw = ImageDraw.Draw(finalImg)
 	print photo
 	
-	draw.text((20, 180),title,(255,255,255),font=titleFont)
-	draw.text((20, 220),dt,(255,255,255),font=dtFont)
+	draw.text((20, 160),title,(255,255,255),font=titleFont)
+	draw.text((20, 190),dt,(255,255,255),font=dtFont)
 
 	for line in lines:
-		draw.text((20, 360+n),line,(255,255,255),font=font)
-		n += 22
+		emojiline = emoji.emojize(line)
+		draw.text((20, 220+n),emojiline,(255,255,255),font=font)
+		n += 25
 			
 	finalImg.save(photo)
 	
