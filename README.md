@@ -24,6 +24,7 @@ network={
 ```
 quiet logo.nologo vt.global_cursor_default=0 consoleblank=0 loglevel=1 disable_splash=1 console=tty3
 ```
+- This seems to be inconsistant, need to research why it doesn't always produce a message free boot
 4) Disable the Login Prompt:
 ```
 systemctl disable getty@tty1
