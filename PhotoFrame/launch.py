@@ -310,13 +310,81 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 		n += 25
 			
 	finalImg.save(photo)
-	
+
+def getFacebookPhotos():
+	fbUserCount = int(Config.get('FacebookUsers','Count'))
+	for x in range(fbUserCount):
+		fbToken = Config.get('FacebookUser'+ str(x+1),'fbToken')
+		facebookURL = "https://graph.facebook.com/me/photos?access_token=" + fbToken
+		
+		print facebookURL
+		facebookJSON = ajaxRequest(facebookURL)
+		facebookDict = json.loads(facebookJSON)
+		facebookData = facebookDict["data"]
+		
+		profilePic = ""
+		filesDownloaded = 0
+		for picDict in facebookData:
+			# get the image url and current time
+			picID = picDict["id"]
+			caption = picDict["name"]
+			print picID
+			print profilePic
+			profilePic = "https://graph.facebook.com/me/picture?access_token=" + fbToken
+			print "ProfilePic: " + profilePic
+			svProfilePath = os.path.join(configdir,"photos","FBProfPic.jpg")
+			urllib.urlretrieve(profilePic, svProfilePath)
+
+			svPhotoName = "fb-" + picID + ".jpg"
+			svPhotoPath = os.path.join(configdir,"photos",svPhotoName)
+
+			imageUrl = "https://graph.facebook.com/"+picID+"?fields=images&access_token=" + fbToken
+			imagesJSON = ajaxRequest(imageUrl)
+			imagesDict = json.loads(imagesJSON)
+			imagesData = imagesDict["images"]
+			title = "Facebook Photo"
+			picDate = ""
+			print "=========================="
+			print picID
+			print "=========================="
+			for image in imagesData:
+				imageW = image["width"]
+				imageH = image["height"]
+				print "ImageW:"
+				print imageW
+				print "ImageH:"
+				print imageH
+				imageDL = ""
+				if imageW > imageH:
+					print "Landscape"
+					imageDL = ""
+				else:
+					print "Portrait"
+					if imageH > 900:
+						imageDL = image["source"]
+						print "Downloading: "+imageDL
+						urllib.urlretrieve(imageDL, svPhotoPath)
+						addTextToPhoto(svPhotoPath,caption,svProfilePath,title,picDate)
+						filesDownloaded+=1
+
+			print ""
+			print ""
+		if int(filesDownloaded) > 0:
+			os.remove(svProfilePath)
+
 #Download photos from Instagram
 if Config.get('Plugins','Instagram') == 'True':
         try:
                 getIgPhotoList()
         except:
                 print "there was a problem with the Instagram Plugin"
+
+#Download photos from Facebook
+if Config.get('Plugins','Facebook') == 'True':
+	try:
+		getFacebookPhotos()
+	except:
+                print "there was a problem with the Facebook Plugin"
 
 #Download photos from Google Photos Album
 if Config.get('Plugins','GooglePhotos') == 'True':
