@@ -24,7 +24,7 @@ network={
     - Disable the Splash screen service:
     ```sudo systemctl mask plymouth-start.service```
     - Add the following to the end of cmdline.txt:
-    ```logo.nologo vt.global_cursor_default=0 quiet```
+    ```console=tty3 logo.nologo vt.global_cursor_default=0 quiet```
     - Add the following to the end of config.txt:
     ```disable_splash=1```
 
