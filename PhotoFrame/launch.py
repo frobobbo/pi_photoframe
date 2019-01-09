@@ -15,7 +15,7 @@ import time
 import urllib
 import urllib2
 import webbrowser
-import emoji
+#import emoji
 
 from apiclient.discovery import build
 from datetime import datetime, timedelta
@@ -38,7 +38,7 @@ print osType
 if osType == "Windows":
 	#Windows
 	configdir = os.path.expanduser("~\Documents\PhotoFrame")
-	fontName = "calibrib.ttf"
+	fontName = "DejaVuSans.ttf"
 elif osType == "Darwin":
 	#MacOS
 	fontName = "/Library/Fonts/DejaVuSans.ttf"
@@ -305,8 +305,8 @@ def addTextToPhoto(photo,txt,prof,title,dt):
 	draw.text((20, 190),dt,(255,255,255),font=dtFont)
 
 	for line in lines:
-		emojiline = emoji.emojize(line)
-		draw.text((20, 220+n),emojiline,(255,255,255),font=font)
+#		emojiline = emoji.emojize(line)
+		draw.text((20, 220+n),line,(255,255,255),font=font)
 		n += 25
 			
 	finalImg.save(photo)
@@ -315,8 +315,18 @@ def getFacebookPhotos():
 	fbUserCount = int(Config.get('FacebookUsers','Count'))
 	for x in range(fbUserCount):
 		fbToken = Config.get('FacebookUser'+ str(x+1),'fbToken')
+		#Get User's Name
+		fbProfileURL = "https://graph.facebook.com/me?access_token="+fbToken
+		profileJSON = ajaxRequest(fbProfileURL)
+		profileDict = json.loads(profileJSON)
+		profileData = profileDict["name"]
+		firstName = profileData.split(" ")[0]
+		print "Profile Name: " + profileData
+		print "First Name: " + firstName
+
+
 		facebookURL = "https://graph.facebook.com/me/photos?access_token=" + fbToken
-		
+	
 		print facebookURL
 		facebookJSON = ajaxRequest(facebookURL)
 		facebookDict = json.loads(facebookJSON)
@@ -328,10 +338,7 @@ def getFacebookPhotos():
 			# get the image url and current time
 			picID = picDict["id"]
 			caption = picDict["name"]
-			print picID
-			print profilePic
-			profilePic = "https://graph.facebook.com/me/picture?access_token=" + fbToken
-			print "ProfilePic: " + profilePic
+			profilePic = "https://graph.facebook.com/me/picture?width=130&access_token=" + fbToken
 			svProfilePath = os.path.join(configdir,"photos","FBProfPic.jpg")
 			urllib.urlretrieve(profilePic, svProfilePath)
 
@@ -342,49 +349,43 @@ def getFacebookPhotos():
 			imagesJSON = ajaxRequest(imageUrl)
 			imagesDict = json.loads(imagesJSON)
 			imagesData = imagesDict["images"]
-			title = "Facebook Photo"
+			title = firstName +"'s Facebook Photo"
 			picDate = ""
-			print "=========================="
-			print picID
-			print "=========================="
 			for image in imagesData:
 				imageW = image["width"]
 				imageH = image["height"]
-				print "ImageW:"
-				print imageW
-				print "ImageH:"
-				print imageH
 				imageDL = ""
 				if imageW > imageH:
 					print "Landscape"
 					imageDL = ""
 				else:
 					print "Portrait"
-					if imageH > 900:
+					print "ImageH"
+					print imageH
+					if imageH <= 640:
+						print "image is less than 640"
 						imageDL = image["source"]
 						print "Downloading: "+imageDL
 						urllib.urlretrieve(imageDL, svPhotoPath)
 						addTextToPhoto(svPhotoPath,caption,svProfilePath,title,picDate)
 						filesDownloaded+=1
-
-			print ""
-			print ""
+						break
 		if int(filesDownloaded) > 0:
 			os.remove(svProfilePath)
 
 #Download photos from Instagram
 if Config.get('Plugins','Instagram') == 'True':
-        try:
-                getIgPhotoList()
-        except:
-                print "there was a problem with the Instagram Plugin"
+	try:
+		getIgPhotoList()
+	except:
+		print "there was a problem with the Instagram Plugin"
 
 #Download photos from Facebook
 if Config.get('Plugins','Facebook') == 'True':
 	try:
 		getFacebookPhotos()
 	except:
-                print "there was a problem with the Facebook Plugin"
+		print "there was a problem with the Facebook Plugin"
 
 #Download photos from Google Photos Album
 if Config.get('Plugins','GooglePhotos') == 'True':
