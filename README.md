@@ -21,13 +21,13 @@ network={
 }
 ```
 3) Configure quiet boot
- - Disable the Splash screen service:
- ```sudo systemctl mask plymouth-start.service```
- - Add the following to the end of cmdline.txt:
- ```
- logo.nologo vt.global_cursor_default=0 quiet
- ```
-- This seems to be inconsistant, need to research why it doesn't always produce a message free boot
+    - Disable the Splash screen service:
+    ```sudo systemctl mask plymouth-start.service```
+    - Add the following to the end of cmdline.txt:
+    ```logo.nologo vt.global_cursor_default=0 quiet```
+    - Add the following to the end of config.txt:
+    ```disable_splash=1```
+
 4) Disable the Login Prompt:
 ```
 systemctl disable getty@tty1
