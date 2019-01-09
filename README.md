@@ -20,10 +20,13 @@ network={
     key_mgmt=WPA-PSK
 }
 ```
-3) Add the following to the end of cmdline.txt:
-```
-quiet logo.nologo vt.global_cursor_default=0 consoleblank=0 loglevel=1 disable_splash=1 console=tty3
-```
+3) Configure quiet boot
+ - Disable the Splash screen service:
+ ```sudo systemctl mask plymouth-start.service```
+ - Add the following to the end of cmdline.txt:
+ ```
+ logo.nologo vt.global_cursor_default=0 quiet
+ ```
 - This seems to be inconsistant, need to research why it doesn't always produce a message free boot
 4) Disable the Login Prompt:
 ```
