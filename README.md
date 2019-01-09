@@ -30,7 +30,7 @@ network={
 
 4) Disable the Login Prompt:
 ```
-systemctl disable getty@tty1
+sudo systemctl disable getty@tty1
 ```
 5) Configure Boot Screen:
     Reference: https://yingtongli.me/blog/2016/12/21/splash.html
@@ -50,8 +50,11 @@ systemctl disable getty@tty1
     WantedBy=local-fs.target
     ```
     - Download bannerd to /usr/share/bootscreen
+    ```
+    sudo chmod u+x /usr/share/bootscreen/bannerd
+    ```
     - unzip frames.zip to /usr/share/bootscreen/frames
     - Execute the following to enable the service:
-    ```systemctl enable bootscreen```
+    ```sudo systemctl enable bootscreen```
     - Animated files can be created from an animated gif using ffmpeg:
     ```ffmpeg -i animated.gif folder\%04d.bmp```
