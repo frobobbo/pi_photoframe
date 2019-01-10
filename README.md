@@ -3,6 +3,8 @@ Python Script to download photos from Instagram/Google Photos and display
 
 # TODO:
 1) Create Global Config file
+2) Incorporate the amazing work of https://github.com/jasbur/RaspiWiFi to create a user-friendly Wifi Setup process
+   - Project Forked: https://github.com/frobobbo/RaspiWiFi
 
 # Setup
 Follow the follwing instructions for headless wifi config:
