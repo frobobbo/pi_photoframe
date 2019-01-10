@@ -1,5 +1,5 @@
 # pi_photoframe
-Python Script to download photos from Instagram/Google Photos and display
+Python Script to download photos from Google Photos/Instagram/Facebook (others?) and display
 
 # TODO:
 1) Create Global Config file
