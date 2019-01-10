@@ -5,6 +5,7 @@ Python Script to download photos from Google Photos/Instagram/Facebook (others?)
 1) Create Global Config file
 2) Incorporate the amazing work of https://github.com/jasbur/RaspiWiFi to create a user-friendly Wifi Setup process
    - Project Forked: https://github.com/frobobbo/RaspiWiFi
+3) Add ability to change bootscreen animation
 
 # Setup
 Follow the follwing instructions for headless wifi config:
