@@ -230,7 +230,15 @@ def ajaxRequest(url=None):
 	response = f.read()
 	f.close()
 	return response	
-		
+
+def convertHEIC(photoName):
+	photoPath = os.path.join(configdir,"photos",photoName)
+
+	print('Converting file: ' + photoPath+'.HEIC to: ' + photoPath+'.jpg')
+	# magick IMG_0606.heic test.jpg
+	call(['magick', photoPath+'.HEIC', photoPath+'.jpg'])
+	os.remove(photoPath+'.heic')
+
 def getIgPhotoList():
 	global igPhotoList
 	igUserCount = int(Config.get('InstagramUsers','Count'))
