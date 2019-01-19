@@ -57,6 +57,7 @@ sudo systemctl disable getty@tty1
     sudo chmod u+x /usr/share/bootscreen/bannerd
     ```
     - unzip frames.zip to /usr/share/bootscreen/frames
+    ```unzip frames.zip -d /usr/share/bootscreen/```
     - Execute the following to enable the service:
     ```sudo systemctl enable bootscreen```
     - Animated files can be created from an animated gif using ffmpeg:
