@@ -97,7 +97,8 @@ def getCurrentPhotoList():
 	global currPhotoList
 #	currPhotoList = next(os.walk(photoPath))[2]
 	l=os.listdir(photoPath)
-	l.remove('.DS_Store')
+	try:
+		l.remove('.DS_Store')
 	currPhotoList=[x.split('.')[0] for x in l]
 ########################################################################
 #                                                                      #
