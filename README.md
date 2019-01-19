@@ -61,3 +61,14 @@ sudo systemctl disable getty@tty1
     ```sudo systemctl enable bootscreen```
     - Animated files can be created from an animated gif using ffmpeg:
     ```ffmpeg -i animated.gif folder\%04d.bmp```
+
+6) Install PhotoFrame
+ ##TODO create install Script
+ - git clone https://github.com/froboboo/pi_photoframe
+ - Copy /pi_photoframe/PhotoFrame to ~/PhotoFrame
+ - copy lines of crontab to crontab -e
+ - copy startup.sh to ~/startup.sh
+ - edit /etc/rc.local with contents of rc.local
+ - copy /pi_photofram/cronjobs to ~/cronjobs
+ - edit startup.sh with appropriate FrameID
+ 
