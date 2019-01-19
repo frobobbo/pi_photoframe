@@ -267,7 +267,7 @@ def convertHEIC(photoName):
 
 	print('Converting file: ' + photoPath+'.HEIC to: ' + photoPath+'.jpg')
 	# magick IMG_0606.heic test.jpg
-	call(['magick', photoPath+'.HEIC', photoPath+'.jpg'])
+	call(['convert', photoPath+'.HEIC', photoPath+'.jpg'])
 	os.remove(photoPath+'.heic')
 
 def getIgPhotoList():
