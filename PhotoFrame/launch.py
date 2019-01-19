@@ -143,7 +143,7 @@ def RemovePhotosfromAlbum():
 	global googlePhotoList
 
 	for pic in currPhotoList:
-		if pic not in googlePhotoList and "ig-" not in pic:
+		if pic not in googlePhotoList and "ig-" not in pic and "fb-" not in pic:
 			#delete photo from local album
 			filePath = os.path.join(configdir,"photos",pic)
 			os.remove(filePath)
