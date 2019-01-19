@@ -21,6 +21,7 @@ from apiclient.discovery import build
 from datetime import datetime, timedelta
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client import file, client, tools
+from subprocess import call
 
 from PIL import Image
 from PIL import ImageFont
@@ -50,8 +51,10 @@ else:
     
 currPhotoList = []
 googlePhotoList = {}
+googleExtList = {}
 googleCaptionList = {}
 igPhotoList = {}
+
 
 Config = configparser.ConfigParser()
 Config.read(Config.read(os.path.join(configdir,"config.ini")))
@@ -92,8 +95,10 @@ def getCurrentPhotoList():
 	photoPath = os.path.join(configdir,"photos")
 	print photoPath
 	global currPhotoList
-	currPhotoList = next(os.walk(photoPath))[2]
-
+#	currPhotoList = next(os.walk(photoPath))[2]
+	l=os.listdir(photoPath)
+	l.remove('.DS_Store')
+	currPhotoList=[x.split('.')[0] for x in l]
 ########################################################################
 #                                                                      #
 #  Get A current list of all the photos in the local photos directory  #
@@ -123,12 +128,21 @@ def getGooglePhotoList():
 		photos = photoList.get('mediaItems',[])
 
 		for photo in photos:
-			googlePhotoList[photo["filename"]] = photo["baseUrl"]+"=w1024"
+			print "FileName: "+photo["filename"]
+			print "MimeType: "+photo["mimeType"]
+			photoName = os.path.splitext(photo["filename"])[0]
+			if photo["mimeType"]=="image/jpeg":
+				googleExtList[photoName] = "jpg"
+			else:
+				googleExtList[photoName] = "heic"
+			print "photoName: "+photoName
+#			googlePhotoList[photo["filename"]] = photo["baseUrl"]+"=w1024"
+			googlePhotoList[photoName] = photo["baseUrl"]+"=w1024"
 			try:
-				googleCaptionList[photo["filename"]] = photo['description'] #.encode('utf-8').strip()
+#				googleCaptionList[photo["filename"]] = photo['description'] #.encode('utf-8').strip()
+				googleCaptionList[photoName] = photo['description'] #.encode('utf-8').strip()
 			except KeyError:
 				pass
-
 ########################################################################
 #                                                                      #
 #   Get the list of photos from Google Photo Album                     #
@@ -141,12 +155,20 @@ def RemovePhotosfromAlbum():
 
 	global currPhotoList
 	global googlePhotoList
+	global googleExtList
 
-	for pic in currPhotoList:
-		if pic not in googlePhotoList and "ig-" not in pic and "fb-" not in pic:
-			#delete photo from local album
-			filePath = os.path.join(configdir,"photos",pic)
-			os.remove(filePath)
+	print len(currPhotoList)
+	print currPhotoList[0]
+	print "In RemovePhotosfromAlbum function"
+	print "-----------------------------------"
+	if len(currPhotoList)>1:
+		for pic in currPhotoList:
+			print "pic in currPhotoList: "+pic
+			if pic not in googlePhotoList and "ig-" not in pic:
+				#delete photo from local album
+				picName = pic + '.jpg'
+				filePath = os.path.join(configdir,"photos",picName)
+				os.remove(filePath)
 
 ########################################################################
 #                                                                      #
@@ -163,13 +185,22 @@ def DownloadPhotosfromGoogle():
 
 
 	for pic in googlePhotoList:
+		print "pic in googlePhotoList: "+pic
 		if pic not in currPhotoList or pic in googleCaptionList:
 			#Download the photo
+			fullPic = pic+"."+str(googleExtList.get(pic))
+			print "pic: "+pic
+			print str(googleExtList.get(pic))
 			print "Download: " + str(googlePhotoList.get(pic))
-			urllib.urlretrieve(googlePhotoList.get(pic), os.path.join(configdir,"photos",pic))
+			urllib.urlretrieve(googlePhotoList.get(pic), os.path.join(configdir,"photos",fullPic))
+			if googleExtList.get(pic).lower() == "heic":
+				#convert to jpg
+				print fullPic+ " is HEIC, will be converted"
+				convertHEIC(os.path.join(configdir,"photos",pic))
+			print "PIC: "+os.path.join(configdir,"photos",pic)
 			if pic in googleCaptionList:
 				#print "Photo will be captioned with: " + str(googleCaptionList.get(pic))
-				addRoundedCaption(os.path.join(configdir,"photos",pic),googleCaptionList.get(pic))
+				addRoundedCaption(os.path.join(configdir,"photos",fullPic),googleCaptionList.get(pic))
 
 ########################################################################
 #                                                                      #
