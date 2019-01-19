@@ -71,4 +71,5 @@ sudo systemctl disable getty@tty1
  - edit /etc/rc.local with contents of rc.local
  - copy /pi_photofram/cronjobs to ~/cronjobs
  - edit startup.sh with appropriate FrameID
+ - Run commands in Setup.txt
  
