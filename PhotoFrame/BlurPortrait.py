@@ -1,3 +1,6 @@
+# An excellent function to make portrait photos dipslay better in widescreen
+# Credit: https://github.com/mrworf/photoframe
+
 import subprocess
 import socket
 import logging
