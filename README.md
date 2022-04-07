@@ -62,6 +62,8 @@ sudo systemctl disable getty@tty1
     ```sudo systemctl enable bootscreen```
     - Animated files can be created from an animated gif using ffmpeg:
     ```ffmpeg -i animated.gif folder\%04d.bmp```
+    - or from a video file, limiting FPS using ffmpeg:
+    ```ffmpeg -i animated.mp4 -vf "fps=10" folder\%04d.bmp```
 
 6) Install PhotoFrame
  ##TODO create install Script
